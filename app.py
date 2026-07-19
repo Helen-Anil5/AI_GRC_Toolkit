@@ -17,13 +17,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar Navigation
-st.sidebar.title("⚖️ AI GRC Toolkit")
+st.sidebar.title("AI GRC Toolkit")
 page = st.sidebar.radio("Navigate", [
     "Home", 
     "Risk Assessment", 
     "Risk Register", 
     "Controls Catalog",
-    "🤖 AI Control Generator"  # 🆕 NEW PAGE
+    "AI Control Generator" 
 ])
 
 # --- HOME PAGE ---
@@ -41,20 +41,20 @@ if page == "Home":
         st.metric("AI Engine", "LLM-Powered ✨")
         
     st.markdown("""
-    ### 🎯 Project Objective
+    ### Project Objective
     This toolkit translates abstract AI ethics and regulatory concepts into actionable, auditable business controls. 
     It provides a standardized method to assess AI systems, map risks to global frameworks, and track mitigating controls.
     
-    ### 🚀 How to Use
+    ### How to Use
     1. Go to **Risk Assessment** to evaluate a new AI use case.
     2. Review the **Risk Register** for pre-mapped HR AI risks.
     3. Consult the **Controls Catalog** for actionable mitigation strategies.
-    4. **🤖 NEW:** Use the AI Control Generator to auto-generate controls from any AI system description!
+    4. **NEW:** Use the AI Control Generator to auto-generate controls from any AI system description!
     """)
 
 # --- RISK ASSESSMENT PAGE ---
 elif page == "Risk Assessment":
-    st.header("📊 AI System Risk Assessment")
+    st.header("AI System Risk Assessment")
     st.markdown("Rate the following dimensions from 1 (Low) to 5 (High) to calculate the inherent risk score.")
     
     col1, col2 = st.columns(2)
@@ -83,7 +83,7 @@ elif page == "Risk Assessment":
 
 # --- RISK REGISTER PAGE ---
 elif page == "Risk Register":
-    st.header("📑 Mapped Risk Register (HR AI Use Case)")
+    st.header("Mapped Risk Register (HR AI Use Case)")
     
     data = {
         "Risk ID": ["R-01", "R-02", "R-03"],
@@ -108,7 +108,7 @@ elif page == "Risk Register":
     st.dataframe(df, use_container_width=True, hide_index=True)
     
     st.download_button(
-        label="📥 Download Risk Register (CSV)",
+        label="Download Risk Register (CSV)",
         data=df.to_csv(index=False).encode('utf-8'),
         file_name='ai_risk_register.csv',
         mime='text/csv'
@@ -116,7 +116,7 @@ elif page == "Risk Register":
 
 # --- CONTROLS CATALOG PAGE ---
 elif page == "Controls Catalog":
-    st.header("🛡️ Mitigating Controls Catalog")
+    st.header("Mitigating Controls Catalog")
     
     controls_data = {
         "Control ID": ["C-01", "C-02", "C-03"],
@@ -132,9 +132,9 @@ elif page == "Controls Catalog":
     df_controls = pd.DataFrame(controls_data)
     st.dataframe(df_controls, use_container_width=True, hide_index=True)
 
-# --- 🆕 AI CONTROL GENERATOR PAGE ---
-elif page == "🤖 AI Control Generator":
-    st.header("🤖 AI-Powered Control Generator")
+# --- AI CONTROL GENERATOR PAGE ---
+elif page == "AI Control Generator":
+    st.header("AI-Powered Control Generator")
     st.markdown("""
     Describe your AI system below, and our LLM will automatically generate **framework-aligned risks and controls** 
     based on NIST AI RMF and ISO/IEC 42001.
@@ -142,21 +142,21 @@ elif page == "🤖 AI Control Generator":
     
     # Mode selector
     use_mock = st.toggle(
-        "🎭 Use Demo Mode (no API key required)", 
+        "Use Demo Mode (no API key required)", 
         value=True,
         help="Demo mode uses pre-written responses. Turn off to use real OpenAI API (requires API key in .env file)."
     )
     
     # System description input
     system_description = st.text_area(
-        "📝 Describe your AI system:",
+        "Describe your AI system:",
         height=150,
         placeholder="Example: An AI-powered HR chatbot that screens resumes, ranks candidates, and sends automated rejection emails. It processes personal data including names, emails, and work history.",
         help="Be specific about what the AI does, what data it uses, and who it affects."
     )
     
     # Example buttons
-    st.markdown("**💡 Try an example:**")
+    st.markdown("**Try an example:**")
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("HR Resume Screener", use_container_width=True):
@@ -169,8 +169,8 @@ elif page == "🤖 AI Control Generator":
             system_description = "An ML model that analyzes transaction patterns in real-time to detect potential fraud. It can freeze accounts and flags transactions for manual review."
     
     # Generate button
-    if st.button("🚀 Generate Controls", type="primary", disabled=not system_description):
-        with st.spinner("🧠 Analyzing AI system and generating controls..."):
+    if st.button("Generate Controls", type="primary", disabled=not system_description):
+        with st.spinner("Analyzing AI system and generating controls..."):
             controls_output = generate_controls_with_llm(system_description, use_mock=use_mock)
         
         st.divider()
@@ -180,22 +180,22 @@ elif page == "🤖 AI Control Generator":
         col1, col2 = st.columns(2)
         with col1:
             st.download_button(
-                label="📥 Download as Markdown",
+                label="Download as Markdown",
                 data=controls_output,
                 file_name="ai_controls_report.md",
                 mime="text/markdown"
             )
         with col2:
             st.download_button(
-                label="📋 Copy to Clipboard",
+                label="Copy to Clipboard",
                 data=controls_output,
                 mime="text/plain"
             )
         
-        st.success("✅ Controls generated successfully! Review and customize for your organization.")
+        st.success("Controls generated successfully! Review and customize for your organization.")
     
     # Info box
     st.info("""
-    **💡 How it works:** This feature uses a Large Language Model (LLM) trained on GRC best practices to analyze your AI system description and generate tailored risks and controls. 
+    **How it works:** This feature uses a Large Language Model (LLM) trained on GRC best practices to analyze your AI system description and generate tailored risks and controls. 
     In demo mode, it uses pre-written responses. Connect your OpenAI API key in the `.env` file for fully customized, real-time generation.
     """)

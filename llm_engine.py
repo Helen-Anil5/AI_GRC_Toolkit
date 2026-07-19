@@ -5,14 +5,10 @@ Includes a mock mode for demo purposes (no API key required).
 """
 
 import os
-from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "mock-key"))
 
 # System prompt that instructs the LLM on how to behave as a GRC expert
 SYSTEM_PROMPT = """You are an expert AI Governance, Risk, and Compliance (GRC) consultant 
@@ -50,8 +46,11 @@ def generate_controls_with_llm(system_description: str, use_mock: bool = False) 
     if use_mock or not os.getenv("OPENAI_API_KEY"):
         return _get_mock_response(system_description)
     
-    # Real LLM mode
+    # Real LLM mode - only initialize client if we actually need it
     try:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        
         response = client.chat.completions.create(
             model="gpt-4o-mini",  # Cost-effective model
             messages=[
@@ -64,7 +63,7 @@ def generate_controls_with_llm(system_description: str, use_mock: bool = False) 
         return response.choices[0].message.content
     
     except Exception as e:
-        return f"⚠️ Error calling LLM: {str(e)}\n\nFalling back to mock response.\n\n" + _get_mock_response(system_description)
+        return f"Error calling LLM: {str(e)}\n\nFalling back to mock response.\n\n" + _get_mock_response(system_description)
 
 
 def _get_mock_response(system_description: str) -> str:
@@ -74,7 +73,7 @@ def _get_mock_response(system_description: str) -> str:
     desc_lower = system_description.lower()
     
     if any(word in desc_lower for word in ["hr", "resume", "hiring", "recruit"]):
-        return """## 🎯 AI System Analysis: HR Resume Screener
+        return """## AI System Analysis: HR Resume Screener
 
 Based on your description, here are the critical risks and recommended controls:
 
@@ -85,14 +84,14 @@ Based on your description, here are the critical risks and recommended controls:
 | R-03 | Inability to explain candidate rejection decisions | MANAGE 3.3 | A.8.7 | Deploy SHAP values for explainability; mandate Human-in-the-Loop for all rejections | Administrative | HR Compliance |
 | R-04 | Model drift degrading ranking accuracy over time | MEASURE 2.5 | A.8.5 | Monitor prediction distributions weekly; trigger retraining on accuracy drop >5% | Detective | ML Engineer |
 
-### 📋 Implementation Priority
+### Implementation Priority
 1. **Immediate (Week 1-2):** Deploy PII anonymization (R-02)
 2. **Short-term (Month 1):** Implement fairness audits (R-01)
 3. **Ongoing:** Quarterly explainability reviews (R-03)
 """
     
     elif any(word in desc_lower for word in ["chatbot", "customer", "support"]):
-        return """## 🎯 AI System Analysis: Customer Service Chatbot
+        return """## AI System Analysis: Customer Service Chatbot
 
 Based on your description, here are the critical risks and recommended controls:
 
@@ -103,14 +102,14 @@ Based on your description, here are the critical risks and recommended controls:
 | R-03 | Customer data leakage through prompt injection attacks | GOVERN 2.5 | A.8.3 | Sanitize all inputs; implement PII detection in outputs; rate-limit API calls | Preventive | InfoSec Team |
 | R-04 | Escalation failures for complex/emotional customer issues | MAP 2.3 | A.8.2 | Define clear escalation triggers; monitor sentiment; require HITL for high-stakes cases | Administrative | CX Operations |
 
-### 📋 Implementation Priority
+### Implementation Priority
 1. **Immediate:** Deploy content guardrails (R-01)
 2. **Week 1-2:** Implement RAG with knowledge base (R-02)
 3. **Month 1:** Red-team testing and escalation workflows (R-03, R-04)
 """
     
     else:
-        return """## 🎯 AI System Analysis: General AI System
+        return """## AI System Analysis: General AI System
 
 Based on your description, here are the critical risks and recommended controls:
 
@@ -121,10 +120,10 @@ Based on your description, here are the critical risks and recommended controls:
 | R-03 | Lack of transparency in decision-making process | MANAGE 3.3 | A.8.7 | Deploy explainability tools (SHAP/LIME); create user-facing documentation | Administrative | AI Ethics Officer |
 | R-04 | Model performance degradation over time | MEASURE 2.5 | A.8.5 | Monitor drift metrics weekly; establish retraining triggers | Detective | ML Engineer |
 
-### 📋 Implementation Priority
+### Implementation Priority
 1. **Immediate:** Data access controls (R-02)
 2. **Short-term:** Bias testing and explainability (R-01, R-03)
 3. **Ongoing:** Continuous monitoring (R-04)
 
-💡 **Tip:** For more tailored controls, connect a real OpenAI API key in the `.env` file.
+**Tip:** For more tailored controls, connect a real OpenAI API key in the `.env` file.
 """
